@@ -7,7 +7,7 @@ const server = createServer(app);
 import cors from 'cors';
 const io = new Server(server, {
 	cors: {
-		origin: 'http://localhost:5173', // Replace with the actual origin of your SvelteKit app
+		origin: 'https://svelte-gallery.onrender.com', // Replace with the actual origin of your SvelteKit app
 		methods: ['GET', 'POST']
 	}
 });
