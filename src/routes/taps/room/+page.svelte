@@ -7,7 +7,7 @@
 	import { v4 as uuidv4 } from 'uuid';
 
 	function establishConnection() {
-		websocket.set(io('http://localhost:3000'));
+		websocket.set(io('https://tapsws.onrender.com'));
 		if ($websocket !== null) {
 			$websocket.on('roomJoined', () => {
 				console.log('hello from on event');

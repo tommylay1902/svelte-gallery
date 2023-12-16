@@ -2,7 +2,7 @@
 	import { setContext } from 'svelte';
 	import '../app.css';
 	import { io } from 'socket.io-client';
-	const socket = io('http://localhost:3000');
+	const socket = io('https://tapsws.onrender.com');
 	socket.on('roomJoined', () => {
 		console.log('join!');
 	});
