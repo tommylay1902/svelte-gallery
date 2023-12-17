@@ -6,7 +6,7 @@
 	import { io } from 'socket.io-client';
 
 	function establishConnection() {
-		//
+		//https://tapsws.onrender.com
 		websocket.set(io('https://tapsws.onrender.com'));
 		if ($websocket !== null) {
 			$websocket.on('roomJoined', () => {

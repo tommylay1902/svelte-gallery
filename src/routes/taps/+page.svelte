@@ -37,6 +37,13 @@
 		}
 	}
 
+	function clickHandler() {
+		$websocket?.emit('keydown', $page.data.room);
+
+		$websocket?.emit('keyup', $page.data.room);
+		playerCount--;
+	}
+
 	onDestroy(() => {
 		$websocket = null;
 	});
@@ -51,7 +58,7 @@
 				{playerCount}
 			</span>
 		</div>
-		<div>
+		<div on:click={clickHandler}>
 			<span
 				class="text-teal-100 border-solid border-4 rounded-lg px-[15vw] py-[5vh]"
 				class:highlight={canHighlight}
