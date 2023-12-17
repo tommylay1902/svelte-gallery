@@ -5,6 +5,7 @@ import { createServer } from 'node:http';
 const app = express();
 const server = createServer(app);
 import cors from 'cors';
+// https://svelte-gallery.onrender.com
 const io = new Server(server, {
 	cors: {
 		origin: 'https://svelte-gallery.onrender.com', // Replace with the actual origin of your SvelteKit app
@@ -18,9 +19,7 @@ const activeRooms = new Map();
 
 io.on('connection', (socket) => {
 	// Listen for "create room" event
-	// Listen for "create room" event
 	socket.on('createRoom', (eventData) => {
-		console.log(eventData);
 		// Check if the room already exists
 		if (activeRooms.has(eventData.roomName)) {
 			// Notify the client that the room already exists
@@ -29,14 +28,14 @@ io.on('connection', (socket) => {
 			// Create a room and join it
 			socket.join(eventData.roomName);
 			activeRooms.set(eventData.roomName, {
-				creator: eventData.playerId,
-				members: [eventData.playerId]
+				creator: socket.id,
+				members: [socket.id]
 			});
 
-			console.log(`User ${eventData.playerId} created and joined room: ${eventData.roomName}`);
+			console.log(`User ${socket.id} created and joined room: ${eventData.roomName}`);
 
 			// Notify the client that the room was created
-			socket.emit('room created', eventData.roomName, eventData.playerId);
+			socket.emit('room created', eventData.roomName, socket.id);
 		}
 	});
 
@@ -48,30 +47,27 @@ io.on('connection', (socket) => {
 		const room = activeRooms.get(eventData.roomName);
 		if (!room) {
 			// Notify the client that the room already exists
-			console.log('issue');
 			socket.emit('room doesnt exist', eventData.roomName);
 		} else if (room.members.length == 1) {
 			socket.join(eventData.roomName);
-			room.members.push(eventData.playerId);
+			room.members.push(socket.id);
 			activeRooms.set(eventData.roomName, room);
-			console.log(`User ${eventData.playerId} joined room: ${eventData.roomName}`);
-			socket.to(eventData.roomName).emit('roomJoined', eventData.playerId);
+			console.log(`User ${socket.id} joined room: ${eventData.roomName}`);
+			socket.to(eventData.roomName).emit('roomJoined', socket.id);
 		} else {
 			socket.emit('room is full');
 		}
 	});
 
 	socket.on('keydown', (roomName) => {
-		socket.to(roomName).emit('keydownEvent', 'hello');
+		socket.to(roomName).emit('keydownEvent', roomName);
 	});
 
 	socket.on('keyup', (roomName) => {
-		socket.to(roomName).emit('keyupEvent', 'hello');
+		socket.to(roomName).emit('keyupEvent', roomName);
 	});
 
 	socket.on('disconnect', () => {
-		console.log('User disconnected');
-
 		// Remove the user from the room
 		activeRooms.forEach((room, roomName) => {
 			const index = room.members.indexOf(socket.id);
