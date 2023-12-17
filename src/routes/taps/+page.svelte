@@ -37,11 +37,13 @@
 		}
 	}
 
-	function clickHandler() {
-		$websocket?.emit('keydown', $page.data.room);
-
-		$websocket?.emit('keyup', $page.data.room);
-		playerCount--;
+	$: {
+		if (playerCount === 0) {
+			alert('YOU WIN!');
+		}
+		if (opponentCount === 0) {
+			alert('YOU LOSE!');
+		}
 	}
 
 	onDestroy(() => {
@@ -58,7 +60,7 @@
 				{playerCount}
 			</span>
 		</div>
-		<div on:click={clickHandler}>
+		<div>
 			<span
 				class="text-teal-100 border-solid border-4 rounded-lg px-[15vw] py-[5vh]"
 				class:highlight={canHighlight}

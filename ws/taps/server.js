@@ -8,7 +8,7 @@ import cors from 'cors';
 // https://svelte-gallery.onrender.com
 const io = new Server(server, {
 	cors: {
-		origin: 'https://svelte-gallery.onrender.com', // Replace with the actual origin of your SvelteKit app
+		origin: 'https://svelte-gallery.onrender.com',
 		methods: ['GET', 'POST']
 	}
 });
