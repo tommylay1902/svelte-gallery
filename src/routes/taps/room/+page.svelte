@@ -2,43 +2,22 @@
 	import { goto } from '$app/navigation';
 	import CreateSvg from '$lib/taps/components/CreateSVG.svelte';
 	import JoinSVG from '$lib/taps/components/JoinSVG.svelte';
-	import { websocket } from '$lib/taps/store/websocket';
-	import { io } from 'socket.io-client';
-
-	function establishConnection() {
-		//https://tapsws.onrender.com
-		websocket.set(io('https://tapsws.onrender.com'));
-		if ($websocket !== null) {
-			$websocket.on('roomJoined', () => {
-				console.log('hello from on event');
-			});
-
-			$websocket.on('keydownEvent', () => {
-				console.log('keydownEvent');
-			});
-		}
-	}
 
 	function createRoom() {
-		establishConnection();
 		const roomName = prompt('Input room name');
 
-		if (roomName && $websocket !== null) {
-			const eventData = { roomName };
-			console.log('about to emit event', eventData);
-			$websocket.emit('createRoom', eventData);
+		if (roomName) {
+			// $websocket.emit('createRoom', eventData);
 
-			goto(`/taps?room=${roomName}`);
+			goto(`/taps?room=${roomName}&create=true`);
 		}
 	}
 
 	function joinRoom() {
-		establishConnection();
 		const roomName = prompt('Input room name');
 
-		if (roomName && $websocket !== null) {
-			const eventData = { roomName };
-			$websocket?.emit('joinRoom', eventData);
+		if (roomName) {
+			// $websocket?.emit('joinRoom', eventData);
 			goto(`/taps?room=${roomName}`);
 		}
 	}

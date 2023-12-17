@@ -23,7 +23,7 @@ io.on('connection', (socket) => {
 		// Check if the room already exists
 		if (activeRooms.has(eventData.roomName)) {
 			// Notify the client that the room already exists
-			socket.emit('room exists', eventData.roomName);
+			socket.emit('roomAE', eventData.roomName);
 		} else {
 			// Create a room and join it
 			socket.join(eventData.roomName);
@@ -47,12 +47,14 @@ io.on('connection', (socket) => {
 		const room = activeRooms.get(eventData.roomName);
 		if (!room) {
 			// Notify the client that the room already exists
-			socket.emit('room doesnt exist', eventData.roomName);
+			socket.emit('roomDNE', eventData.roomName);
 		} else if (room.members.length == 1) {
 			socket.join(eventData.roomName);
+
 			room.members.push(socket.id);
+
 			activeRooms.set(eventData.roomName, room);
-			console.log(`User ${socket.id} joined room: ${eventData.roomName}`);
+
 			socket.to(eventData.roomName).emit('roomJoined', socket.id);
 		} else {
 			socket.emit('room is full');
@@ -79,12 +81,12 @@ io.on('connection', (socket) => {
 				if (room.members.length === 0) {
 					activeRooms.delete(roomName);
 					console.log(`Room ${roomName} deleted as there are no members.`);
+				} else {
+					socket.to(roomName).emit('opponentDisconnected');
 				}
-
-				// Notify other clients in the room about the disconnection
-				socket.to(roomName).emit('userDisconnected', socket.id);
 			}
 		});
+		console.log('broadcasting disconnection');
 	});
 });
 

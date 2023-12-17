@@ -1,26 +1,15 @@
 <script lang="ts">
 	import { websocket } from '$lib/taps/store/websocket';
 	import { page } from '$app/stores';
-	import { onDestroy } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
+	import { io } from 'socket.io-client';
+	import { goto } from '$app/navigation';
 
 	let playerCount = 100;
 	let opponentCount = 100;
 
 	let canHighlight: boolean = false;
 	let canHighlightOpp: boolean = false;
-
-	$websocket?.on('keydownEvent', () => {
-		canHighlightOpp = true;
-	});
-
-	$websocket?.on('keyupEvent', () => {
-		canHighlightOpp = false;
-		opponentCount--;
-	});
-
-	$websocket?.on('disconnect', () => {
-		$websocket = null;
-	});
 
 	function keydownHandler(event: KeyboardEvent) {
 		if (event.key === ' ') {
@@ -46,8 +35,45 @@
 		}
 	}
 
+	onMount(() => {
+		//https://tapsws.onrender.com
+		websocket.set(io('https://tapsws.onrender.com'));
+		if ($websocket !== null) {
+			$websocket.on('roomDNE', () => {
+				goto('/taps/room');
+			});
+
+			$websocket.on('roomAE', () => {
+				goto('/taps/room');
+			});
+			$websocket?.on('keydownEvent', () => {
+				canHighlightOpp = true;
+			});
+
+			$websocket?.on('keyupEvent', () => {
+				canHighlightOpp = false;
+				opponentCount--;
+			});
+
+			$websocket?.on('opponentDisconnected', () => {
+				alert('opponent disconnected');
+				playerCount = 100;
+				opponentCount = 100;
+			});
+		}
+
+		if ($page.data.create) {
+			$websocket?.emit('createRoom', { roomName: $page.data.room });
+		} else {
+			console.log('joining room');
+			$websocket?.emit('joinRoom', { roomName: $page.data.room });
+		}
+	});
+
 	onDestroy(() => {
+		$websocket?.disconnect();
 		$websocket = null;
+		$websocket = $websocket;
 	});
 </script>
 
