@@ -1,32 +1,45 @@
 <script lang="ts">
 	import { websocket } from '$lib/taps/store/websocket';
+	import { page } from '$app/stores';
+	import { onDestroy } from 'svelte';
 
 	let playerCount = 100;
 	let opponentCount = 100;
 
 	let canHighlight: boolean = false;
 	let canHighlightOpp: boolean = false;
+
 	$websocket?.on('keydownEvent', () => {
 		canHighlightOpp = true;
 	});
+
 	$websocket?.on('keyupEvent', () => {
 		canHighlightOpp = false;
 		opponentCount--;
 	});
 
+	$websocket?.on('disconnect', () => {
+		$websocket = null;
+	});
+
 	function keydownHandler(event: KeyboardEvent) {
 		if (event.key === ' ') {
-			$websocket?.emit('keydown', 'hello');
+			$websocket?.emit('keydown', $page.data.room);
 			canHighlight = true;
 		}
 	}
+
 	function keyupHandler(event: KeyboardEvent) {
 		if (event.key === ' ') {
-			$websocket?.emit('keyup', 'hello');
+			$websocket?.emit('keyup', $page.data.room);
 			canHighlight = false;
 			playerCount--;
 		}
 	}
+
+	onDestroy(() => {
+		$websocket = null;
+	});
 </script>
 
 <svelte:window on:keydown={keydownHandler} on:keyup={keyupHandler} />

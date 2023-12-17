@@ -4,9 +4,9 @@
 	import JoinSVG from '$lib/taps/components/JoinSVG.svelte';
 	import { websocket } from '$lib/taps/store/websocket';
 	import { io } from 'socket.io-client';
-	import { v4 as uuidv4 } from 'uuid';
 
 	function establishConnection() {
+		//
 		websocket.set(io('https://tapsws.onrender.com'));
 		if ($websocket !== null) {
 			$websocket.on('roomJoined', () => {
@@ -21,27 +21,25 @@
 
 	function createRoom() {
 		establishConnection();
-		const roomName = 'hello';
+		const roomName = prompt('Input room name');
 
 		if (roomName && $websocket !== null) {
-			const playerId = uuidv4();
-			const eventData = { roomName, playerId };
+			const eventData = { roomName };
 			console.log('about to emit event', eventData);
 			$websocket.emit('createRoom', eventData);
 
-			goto(`/taps`);
+			goto(`/taps?room=${roomName}`);
 		}
 	}
 
 	function joinRoom() {
 		establishConnection();
-		const roomName = 'hello';
+		const roomName = prompt('Input room name');
 
 		if (roomName && $websocket !== null) {
-			const playerId = uuidv4();
-			const eventData = { roomName, playerId };
+			const eventData = { roomName };
 			$websocket?.emit('joinRoom', eventData);
-			goto(`/taps?player=${playerId}`);
+			goto(`/taps?room=${roomName}`);
 		}
 	}
 </script>
